@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Persistent data and large caches
+data/cache/*
+!data/cache/.gitkeep
+data/datasets/*
+!data/datasets/.gitkeep
+
+# Local database
+*.db
+*.sqlite3
+
+# Artifacts
+artifacts/models/*
+!artifacts/models/.gitkeep
+artifacts/plots/*
+!artifacts/plots/.gitkeep
+artifacts/reports/*
+!artifacts/reports/.gitkeep
+artifacts/notebooks/*
+!artifacts/notebooks/.gitkeep
+artifacts/logs/*
+!artifacts/logs/.gitkeep
+
+# Environment and secrets
+.env
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
