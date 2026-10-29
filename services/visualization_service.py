@@ -169,3 +169,124 @@ class VisualizationService:
             height=380
         )
         return fig
+
+    @staticmethod
+    def plot_convergence_curve(losses: List[float], iterations: Optional[List[int]] = None, title: str = "Optimization Convergence Curve") -> go.Figure:
+        """Line chart showing loss reduction over iterations during optimization."""
+        x_vals = iterations if iterations is not None else list(range(len(losses)))
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=x_vals,
+            y=losses,
+            mode="lines+markers",
+            name="Loss / Objective",
+            line=dict(color="#2563EB", width=2),
+            marker=dict(size=4)
+        ))
+        fig.update_layout(
+            title=title,
+            xaxis_title="Iteration",
+            yaxis_title="Loss / Objective Function Value",
+            template="plotly_white",
+            margin=dict(l=40, r=40, t=50, b=40),
+            height=380
+        )
+        return fig
+
+    @staticmethod
+    def plot_activation_functions(x_vals: List[float], activations: Dict[str, List[float]]) -> go.Figure:
+        """Multi-line plot comparing different activation functions across an input domain."""
+        fig = go.Figure()
+        colors = ["#2563EB", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"]
+        for i, (name, y_vals) in enumerate(activations.items()):
+            color = colors[i % len(colors)]
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_vals,
+                mode="lines",
+                name=name,
+                line=dict(color=color, width=2)
+            ))
+        fig.add_hline(y=0, line_dash="dash", line_color="#94A3B8")
+        fig.add_vline(x=0, line_dash="dash", line_color="#94A3B8")
+        fig.update_layout(
+            title="Activation Functions Comparison",
+            xaxis_title="Input (z)",
+            yaxis_title="Activation Output f(z)",
+            template="plotly_white",
+            margin=dict(l=40, r=40, t=50, b=40),
+            height=420
+        )
+        return fig
+
+    @staticmethod
+    def plot_clustering_2d(X: List[List[float]], labels: List[int], centers: Optional[List[List[float]]] = None) -> go.Figure:
+        """2D scatter plot of cluster assignments with optional cluster centers."""
+        x_coords = [p[0] for p in X]
+        y_coords = [p[1] for p in X]
+        str_labels = [f"Cluster {l}" for l in labels]
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=x_coords,
+            y=y_coords,
+            mode="markers",
+            marker=dict(
+                size=8,
+                color=labels,
+                colorscale="Viridis",
+                opacity=0.8,
+                showscale=False
+            ),
+            text=str_labels,
+            name="Data Points"
+        ))
+
+        if centers:
+            cx = [c[0] for c in centers]
+            cy = [c[1] for c in centers]
+            fig.add_trace(go.Scatter(
+                x=cx,
+                y=cy,
+                mode="markers",
+                marker=dict(
+                    symbol="x",
+                    size=14,
+                    color="#DC2626",
+                    line=dict(width=2, color="black")
+                ),
+                name="Cluster Centers"
+            ))
+
+        fig.update_layout(
+            title="K-Means Clustering Space",
+            xaxis_title="Feature 1",
+            yaxis_title="Feature 2",
+            template="plotly_white",
+            margin=dict(l=40, r=40, t=50, b=40),
+            height=420
+        )
+        return fig
+
+    @staticmethod
+    def plot_elbow_curve(k_values: List[int], inertias: List[float]) -> go.Figure:
+        """Elbow method curve for optimal K determination."""
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=k_values,
+            y=inertias,
+            mode="lines+markers",
+            name="Inertia (WCSS)",
+            line=dict(color="#7C3AED", width=2),
+            marker=dict(size=8, color="#5B21B6")
+        ))
+        fig.update_layout(
+            title="Elbow Method for Optimal K",
+            xaxis_title="Number of Clusters (K)",
+            yaxis_title="Inertia (Within-Cluster Sum of Squares)",
+            template="plotly_white",
+            margin=dict(l=40, r=40, t=50, b=40),
+            height=380
+        )
+        return fig
+

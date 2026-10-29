@@ -42,6 +42,7 @@ class Experiment(Base):
     preprocessing_config_json = Column(Text, default="{}")
     model_config_json = Column(Text, default="{}")
     last_validation_json = Column(Text, default="{}")
+    execution_results_json = Column(Text, default="{}")
     notes = Column(Text, default="")
     
     created_at = Column(DateTime, default=utc_now)

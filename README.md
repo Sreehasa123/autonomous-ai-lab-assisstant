@@ -6,6 +6,12 @@ An autonomous, agentic AI laboratory assistant designed to help researchers, stu
 
 ## 🌟 Key Features
 
+0. **🤖 AI Assistant Conversational Interface (Master Upgrade)**
+   - Chat naturally with your AI Lab Assistant inspired by ChatGPT and Gemini.
+   - Intelligent intent classification: Explanations, Algorithm Comparisons, Code Generation, Error Diagnostics, and Full Autonomous Experiments.
+   - Dynamic workflow routing: automatically differentiates between **dataset-free** experiments (gradient descent, activation function comparisons, synthetic K-means clustering) and **dataset-required** experiments (image classification, NLP, tabular prediction).
+   - Real-time execution logs, metrics extraction, and interactive Plotly charts rendered directly within the chat workspace.
+
 1. **Natural Language Problem Formulation**
    - Enter ML/DL problems in plain English (e.g. *"Identify breast cancer tumor malignancy from cell biopsy dimensions"* or *"Forecast housing prices based on district demographics"*).
    - **Problem Understanding Agent** decomposes the problem into technical task categories, objectives, expected inputs/outputs, target variables, evaluation metrics, and potential risk vectors.

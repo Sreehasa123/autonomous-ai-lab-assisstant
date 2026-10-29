@@ -1,4 +1,5 @@
 """Frontend pages package."""
+from frontend.pages.ai_assistant import render_ai_assistant
 from frontend.pages.dashboard import render_dashboard
 from frontend.pages.new_experiment import render_new_experiment
 from frontend.pages.dataset_explorer import render_dataset_explorer
@@ -12,6 +13,7 @@ from frontend.pages.settings import render_settings
 from frontend.pages.help_documentation import render_help_documentation
 
 __all__ = [
+    "render_ai_assistant",
     "render_dashboard",
     "render_new_experiment",
     "render_dataset_explorer",

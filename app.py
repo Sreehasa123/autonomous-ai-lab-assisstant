@@ -15,6 +15,7 @@ from orchestration.workflow_orchestrator import WorkflowOrchestrator
 from frontend.styles import apply_custom_styles
 from frontend.components import render_status_badge
 from frontend.pages import (
+    render_ai_assistant,
     render_dashboard,
     render_new_experiment,
     render_dataset_explorer,
@@ -51,7 +52,7 @@ repo, orchestrator = get_initialized_services()
 
 # Session State defaults
 if "current_page" not in st.session_state:
-    st.session_state["current_page"] = "Dashboard"
+    st.session_state["current_page"] = "AI Assistant"
 
 if "current_experiment_id" not in st.session_state:
     # Pick latest experiment if available
@@ -81,6 +82,7 @@ with st.sidebar:
 
     # Navigation menu
     nav_options = [
+        "AI Assistant",
         "Dashboard",
         "New Experiment",
         "Dataset Explorer",
@@ -125,7 +127,9 @@ with st.sidebar:
 # --- PAGE ROUTING ---
 page = st.session_state["current_page"]
 
-if page == "Dashboard":
+if page == "AI Assistant":
+    render_ai_assistant(repo, orchestrator, on_navigate=navigate_to)
+elif page == "Dashboard":
     render_dashboard(repo, on_navigate=navigate_to)
 elif page == "New Experiment":
     render_new_experiment(repo, orchestrator, on_navigate=navigate_to)

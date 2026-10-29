@@ -74,12 +74,16 @@ def render_experiment_workspace(repo: ExperimentRepository, orchestrator: Workfl
 
     # TAB 2: DATA & QUALITY AUDIT
     with tab2:
-        dataset_meta = json.loads(exp.selected_dataset_json or "{}")
-        if not dataset_meta:
-            st.warning("No dataset selected for this experiment yet.")
-            if st.button("🔎 Go to Dataset Explorer to Select Dataset", type="primary"):
-                on_navigate("Dataset Explorer")
+        understanding = json.loads(exp.problem_understanding_json or "{}")
+        if not understanding.get("dataset_required", True):
+            st.info("⚡ **Dataset-Free Experiment**: This experiment (e.g. mathematical optimization, algorithm comparison, or synthetic demonstration) is self-contained and does not require an external dataset.")
         else:
+            dataset_meta = json.loads(exp.selected_dataset_json or "{}")
+            if not dataset_meta:
+                st.warning("No dataset selected for this experiment yet.")
+                if st.button("🔎 Go to Dataset Explorer to Select Dataset", type="primary"):
+                    on_navigate("Dataset Explorer")
+            else:
             st.markdown(f"#### Selected Dataset: {dataset_meta.get('name')}")
             st.markdown(f"<span style='color: #64748B;'>Provider: <strong>{dataset_meta.get('source_provider', '').upper()}</strong> | Format: <code>{dataset_meta.get('data_format')}</code></span>", unsafe_allow_html=True)
             
@@ -186,13 +190,23 @@ def render_experiment_workspace(repo: ExperimentRepository, orchestrator: Workfl
             
             run_btn = st.button("🚀 Start Local Training Run", type="primary", use_container_width=True)
             if run_btn:
-                with st.spinner("Running training and evaluating on held-out test split..."):
-                    success, msg, run_rec = orchestrator.execution_agent.experiment_service.execute_local_training(exp.id)
-                    if success:
-                        st.success("Training run finished successfully! View results in the Results tab.")
-                        st.rerun()
+                with st.spinner("Executing pipeline locally..."):
+                    understanding = json.loads(exp.problem_understanding_json or "{}")
+                    if not understanding.get("dataset_required", True):
+                        code_res = orchestrator.generate_code_without_dataset(exp.id)
+                        res = orchestrator.execute_experiment_code(exp.id, code_res.get("generated_code", ""))
+                        if res.get("success"):
+                            st.success("Execution completed successfully! View results in the Results tab.")
+                            st.rerun()
+                        else:
+                            st.error(f"Execution failed: {res.get('execution_result', {}).get('stderr', '')}")
                     else:
-                        st.error(f"Execution failed: {msg}")
+                        success, msg, run_rec = orchestrator.execution_agent.experiment_service.execute_local_training(exp.id)
+                        if success:
+                            st.success("Training run finished successfully! View results in the Results tab.")
+                            st.rerun()
+                        else:
+                            st.error(f"Execution failed: {msg}")
 
         with col_exec_colab:
             st.markdown("##### ☁️ Google Colab Export")
@@ -236,8 +250,31 @@ def render_experiment_workspace(repo: ExperimentRepository, orchestrator: Workfl
     with tab6:
         st.markdown("#### Empirical Evaluation Results & Visualizations")
         runs = sorted(exp.runs, key=lambda r: r.run_number)
-        if not runs:
+        exec_results_data = json.loads(getattr(exp, "execution_results_json", None) or "{}")
+
+        if not runs and not exec_results_data:
             st.info("No training runs recorded yet. Execute training in Tab 5 to view empirical test results.")
+        elif not runs and exec_results_data:
+            metrics_dict = exec_results_data.get("metrics", {})
+            st.markdown(f"**Autonomous Execution Results** | **Duration:** `{exec_results_data.get('duration_seconds', 0):.2f}s`")
+            if metrics_dict:
+                m_cols = st.columns(min(4, max(1, len(metrics_dict))))
+                for idx, (m_name, m_val) in enumerate(metrics_dict.items()):
+                    with m_cols[idx % len(m_cols)]:
+                        st.metric(m_name.replace("_", " ").upper(), f"{m_val:.4f}" if isinstance(m_val, float) else f"{m_val}")
+
+            results_json = exec_results_data.get("results_json", {})
+            if "history" in results_json and isinstance(results_json["history"], list):
+                losses = [h.get("loss") for h in results_json["history"] if "loss" in h]
+                if losses:
+                    st.plotly_chart(VisualizationService.plot_convergence_curve(losses), use_container_width=True)
+            elif "activations" in results_json and "x_values" in results_json:
+                st.plotly_chart(VisualizationService.plot_activation_functions(results_json["x_values"], results_json["activations"]), use_container_width=True)
+            elif "X" in results_json and "labels" in results_json:
+                st.plotly_chart(VisualizationService.plot_clustering_2d(results_json["X"], results_json["labels"], results_json.get("centers")), use_container_width=True)
+
+            with st.expander("📄 View Full Execution Output", expanded=False):
+                st.text(exec_results_data.get("stdout", "No output recorded."))
         else:
             latest_run = runs[-1]
             st.markdown(f"**Latest Run:** `Run #{latest_run.run_number}` | **Mode:** `{latest_run.execution_mode}` | **Duration:** `{latest_run.duration_seconds:.2f}s`")

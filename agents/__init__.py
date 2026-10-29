@@ -15,6 +15,7 @@ from agents.evaluation_agent import EvaluationAgent
 from agents.error_analysis_agent import ErrorAnalysisAgent
 from agents.improvement_agent import ImprovementAgent
 from agents.report_generation_agent import ReportGenerationAgent
+from agents.execution_repair_agent import ExecutionRepairAgent
 
 __all__ = [
     "BaseAgent",
@@ -33,4 +34,5 @@ __all__ = [
     "ErrorAnalysisAgent",
     "ImprovementAgent",
     "ReportGenerationAgent",
+    "ExecutionRepairAgent",
 ]
