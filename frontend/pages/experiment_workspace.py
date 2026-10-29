@@ -84,37 +84,37 @@ def render_experiment_workspace(repo: ExperimentRepository, orchestrator: Workfl
                 if st.button("🔎 Go to Dataset Explorer to Select Dataset", type="primary"):
                     on_navigate("Dataset Explorer")
             else:
-            st.markdown(f"#### Selected Dataset: {dataset_meta.get('name')}")
-            st.markdown(f"<span style='color: #64748B;'>Provider: <strong>{dataset_meta.get('source_provider', '').upper()}</strong> | Format: <code>{dataset_meta.get('data_format')}</code></span>", unsafe_allow_html=True)
-            
-            analysis = json.loads(exp.dataset_analysis_json or "{}")
-            shape = analysis.get("shape", [0, 0])
-            st.markdown(f"- **Dimensions:** `{shape[0]} rows × {shape[1]} columns`")
-            st.markdown(f"- **Target Column:** `{dataset_meta.get('target_column', 'target')}`")
+                st.markdown(f"#### Selected Dataset: {dataset_meta.get('name')}")
+                st.markdown(f"<span style='color: #64748B;'>Provider: <strong>{dataset_meta.get('source_provider', '').upper()}</strong> | Format: <code>{dataset_meta.get('data_format')}</code></span>", unsafe_allow_html=True)
+                
+                analysis = json.loads(exp.dataset_analysis_json or "{}")
+                shape = analysis.get("shape", [0, 0])
+                st.markdown(f"- **Dimensions:** `{shape[0]} rows × {shape[1]} columns`")
+                st.markdown(f"- **Target Column:** `{dataset_meta.get('target_column', 'target')}`")
 
-            # Sample records
-            samples = analysis.get("sample_records", [])
-            if samples:
-                st.markdown("##### Sample Records Preview (First 10 rows)")
-                st.dataframe(pd.DataFrame(samples), use_container_width=True)
+                # Sample records
+                samples = analysis.get("sample_records", [])
+                if samples:
+                    st.markdown("##### Sample Records Preview (First 10 rows)")
+                    st.dataframe(pd.DataFrame(samples), use_container_width=True)
 
-            # Data Quality Audit
-            findings = analysis.get("findings", [])
-            st.markdown("##### 🛡️ Data Quality & Leakage Audit Findings")
-            if not findings:
-                st.success("✅ No critical data leakage or quality risks detected in sample audit.")
-            else:
-                for f in findings:
-                    sev = f.get("severity", "info").lower()
-                    icon = "🚨" if sev in ("critical", "high_risk") else "⚠️"
-                    color = "#EF4444" if sev in ("critical", "high_risk") else "#F59E0B"
-                    st.markdown(f"""
-                    <div style="border-left: 4px solid {color}; padding: 8px 12px; background: #F8FAFC; margin-bottom: 8px; border-radius: 4px;">
-                        <strong>{icon} [{sev.upper()}] {f.get('description')}</strong><br>
-                        <span style="font-size: 13px; color: #475569;">Impact: {f.get('impact')}</span><br>
-                        <span style="font-size: 13px; color: #0284C7;">Action: {f.get('suggested_action')}</span>
-                    </div>
-                    """, unsafe_allow_html=True)
+                # Data Quality Audit
+                findings = analysis.get("findings", [])
+                st.markdown("##### 🛡️ Data Quality & Leakage Audit Findings")
+                if not findings:
+                    st.success("✅ No critical data leakage or quality risks detected in sample audit.")
+                else:
+                    for f in findings:
+                        sev = f.get("severity", "info").lower()
+                        icon = "🚨" if sev in ("critical", "high_risk") else "⚠️"
+                        color = "#EF4444" if sev in ("critical", "high_risk") else "#F59E0B"
+                        st.markdown(f"""
+                        <div style="border-left: 4px solid {color}; padding: 8px 12px; background: #F8FAFC; margin-bottom: 8px; border-radius: 4px;">
+                            <strong>{icon} [{sev.upper()}] {f.get('description')}</strong><br>
+                            <span style="font-size: 13px; color: #475569;">Impact: {f.get('impact')}</span><br>
+                            <span style="font-size: 13px; color: #0284C7;">Action: {f.get('suggested_action')}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
 
     # TAB 3: PREPROCESSING & MODEL CONFIGURATION
     with tab3:
